@@ -42,7 +42,7 @@ while(True):
   elif opcode == OPCODES['NOOP']:
     pc += 1
   else:
-    print('Unrecognized opcode')
+    print('Unrecognized opcode of value ' + str(opcode))
     exit()
   
 # todo: write functions for retrieving value operands, address operands, and register operands
