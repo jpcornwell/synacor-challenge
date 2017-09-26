@@ -2,9 +2,15 @@
 
 OPCODES = {}
 OPCODES['HALT'] = 0
+OPCODES['SET'] = 1
+OPCODES['PUSH'] = 2
+OPCODES['POP'] = 3
+OPCODES['EQ'] = 4
+OPCODES['GT'] = 5
 OPCODES['JMP'] = 6
 OPCODES['JT'] = 7
 OPCODES['JF'] = 8
+OPCODES['ADD'] = 9
 OPCODES['OUT'] = 19
 OPCODES['NOOP'] = 21
 
@@ -16,6 +22,14 @@ def load_val_operand(pc):
     return registers[word - 32768]
   else:
     print('Invalid value operand')
+    exit()
+
+def save_register_operand(pc, value):
+  word = int.from_bytes(memory[pc], byteorder='little')
+  if 32768 <= word <= 32775:
+    registers[word - 32768] = value
+  else:
+    print('Invalid register operand')
     exit()
 
 registers = [0] * 8
@@ -36,6 +50,37 @@ while(True):
   if opcode == OPCODES['HALT']:
     print('Program terminated')
     exit()
+  elif opcode == OPCODES['SET']:
+    val = load_val_operand(pc+2)
+    save_register_operand(pc+1, val)
+    pc += 3
+  elif opcode == OPCODES['PUSH']:
+    val = load_val_operand(pc+1)
+    stack.append(val)
+    pc += 2
+  elif opcode == OPCODES['POP']:
+    if len(stack) == 0:
+      print('Error: Pop operation cannot be performed on an empty stack')
+      exit()
+    val = stack.pop()
+    save_register_operand(pc+1, val)
+    pc += 2
+  elif opcode == OPCODES['EQ']:
+    a = load_val_operand(pc+2)
+    b = load_val_operand(pc+3)
+    if a == b:
+      save_register_operand(pc+1, 1)
+    else:
+      save_register_operand(pc+1, 0)
+    pc += 4
+  elif opcode == OPCODES['GT']:
+    a = load_val_operand(pc+2)
+    b = load_val_operand(pc+3)
+    if a > b:
+      save_register_operand(pc+1, 1)
+    else:
+      save_register_operand(pc+1, 0)
+    pc += 4
   elif opcode == OPCODES['JMP']:
     jump = load_val_operand(pc+1)
     pc = jump
@@ -53,6 +98,12 @@ while(True):
       pc = jump
     else:
       pc += 3
+  elif opcode == OPCODES['ADD']:
+    a = load_val_operand(pc+2)
+    b = load_val_operand(pc+3)
+    sum = (a + b) % 32768
+    save_register_operand(pc+1, sum)
+    pc += 4
   elif opcode == OPCODES['OUT']:
     ascii_val = load_val_operand(pc+1)
     print(chr(ascii_val), end='')
