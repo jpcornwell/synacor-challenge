@@ -2,6 +2,9 @@
 
 OPCODES = {}
 OPCODES['HALT'] = 0
+OPCODES['JMP'] = 6
+OPCODES['JT'] = 7
+OPCODES['JF'] = 8
 OPCODES['OUT'] = 19
 OPCODES['NOOP'] = 21
 
@@ -10,9 +13,7 @@ def load_val_operand(pc):
   if 0 <= word <= 32767:
     return word
   elif 32768 <= word <= 32775:
-    # return register value
-    print("Load value operand from register not implemented")
-    exit()
+    return registers[word - 32768]
   else:
     print('Invalid value operand')
     exit()
@@ -35,6 +36,23 @@ while(True):
   if opcode == OPCODES['HALT']:
     print('Program terminated')
     exit()
+  elif opcode == OPCODES['JMP']:
+    jump = load_val_operand(pc+1)
+    pc = jump
+  elif opcode == OPCODES['JT']:
+    check = load_val_operand(pc+1)
+    jump = load_val_operand(pc+2)
+    if check != 0:
+      pc = jump
+    else:
+      pc += 3
+  elif opcode == OPCODES['JF']:
+    check = load_val_operand(pc+1)
+    jump = load_val_operand(pc+2)
+    if check == 0:
+      pc = jump
+    else:
+      pc += 3
   elif opcode == OPCODES['OUT']:
     ascii_val = load_val_operand(pc+1)
     print(chr(ascii_val), end='')
