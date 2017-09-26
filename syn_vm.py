@@ -11,6 +11,15 @@ OPCODES['JMP'] = 6
 OPCODES['JT'] = 7
 OPCODES['JF'] = 8
 OPCODES['ADD'] = 9
+OPCODES['MULT'] = 10
+OPCODES['MOD'] = 11
+OPCODES['AND'] = 12
+OPCODES['OR'] = 13
+OPCODES['NOT'] = 14
+OPCODES['RMEM'] = 15
+OPCODES['WMEM'] = 16
+OPCODES['CALL'] = 17
+OPCODES['RET'] = 18
 OPCODES['OUT'] = 19
 OPCODES['NOOP'] = 21
 
@@ -24,6 +33,18 @@ def load_val_operand(pc):
     print('Invalid value operand')
     exit()
 
+def load_address_operand(pc):
+  word = int.from_bytes(memory[pc], byteorder='little')
+  if 0 <= word <= 32767:
+    address = word
+  elif 32768 <= word <= 32775:
+    address =  registers[word - 32768]
+  else:
+    print('Invalid address operand')
+    exit()
+  val = int.from_bytes(memory[address], byteorder='little')
+  return val
+
 def save_register_operand(pc, value):
   word = int.from_bytes(memory[pc], byteorder='little')
   if 32768 <= word <= 32775:
@@ -31,6 +52,18 @@ def save_register_operand(pc, value):
   else:
     print('Invalid register operand')
     exit()
+
+def save_address_operand(pc, value):
+  word = int.from_bytes(memory[pc], byteorder='little')
+  if 0 <= word <= 32767:
+    address = word
+  elif 32768 <= word <= 32775:
+    address =  registers[word - 32768]
+  else:
+    print('Invalid address operand')
+    exit()
+  save = value.to_bytes(2, 'little')
+  memory[address] = save
 
 registers = [0] * 8
 memory = [bytes([0, 0]) for i in range(2**15)]
@@ -104,6 +137,61 @@ while(True):
     sum = (a + b) % 32768
     save_register_operand(pc+1, sum)
     pc += 4
+  elif opcode == OPCODES['MULT']:
+    a = load_val_operand(pc+2)
+    b = load_val_operand(pc+3)
+    prod = (a * b) % 32768
+    save_register_operand(pc+1, prod)
+    pc += 4
+  elif opcode == OPCODES['MOD']:
+    a = load_val_operand(pc+2)
+    b = load_val_operand(pc+3)
+    remain = a % b
+    save_register_operand(pc+1, remain)
+    pc += 4
+  elif opcode == OPCODES['AND']:
+    a = load_val_operand(pc+2).to_bytes(2, byteorder='little')
+    b = load_val_operand(pc+3).to_bytes(2, byteorder='little')
+    c = (a[0] & b[0]).to_bytes(1, byteorder='little') + \
+        (a[1] & b[1]).to_bytes(1, byteorder='little')
+    ans = int.from_bytes(c, byteorder='little')
+    save_register_operand(pc+1, ans)
+    pc += 4
+  elif opcode == OPCODES['OR']:
+    a = load_val_operand(pc+2).to_bytes(2, byteorder='little')
+    b = load_val_operand(pc+3).to_bytes(2, byteorder='little')
+    c = (a[0] | b[0]).to_bytes(1, byteorder='little') + \
+        (a[1] | b[1]).to_bytes(1, byteorder='little')
+    ans = int.from_bytes(c, byteorder='little')
+    save_register_operand(pc+1, ans)
+    pc += 4
+  elif opcode == OPCODES['NOT']:
+    a = load_val_operand(pc+2).to_bytes(2, byteorder='little')
+
+    b = (~a[0] & 0xFF).to_bytes(1, 'little') + \
+        (~a[1] & 0x7F).to_bytes(1, 'little')
+    ans = int.from_bytes(b, byteorder='little')
+    save_register_operand(pc+1, ans)
+    pc += 3
+  elif opcode == OPCODES['RMEM']:
+    val = load_address_operand(pc+2)
+    save_register_operand(pc+1, val)
+    pc += 3
+  elif opcode == OPCODES['WMEM']:
+    val = load_val_operand(pc+2)
+    save_address_operand(pc+1, val)
+    pc += 3
+  elif opcode == OPCODES['CALL']:
+    address = pc + 2
+    stack.append(address)
+    jump = load_val_operand(pc+1)
+    pc = jump
+  elif opcode == OPCODES['RET']:
+    if len(stack) == 0:
+      print('Program terminated')
+      exit()
+    jump = stack.pop()
+    pc = jump
   elif opcode == OPCODES['OUT']:
     ascii_val = load_val_operand(pc+1)
     print(chr(ascii_val), end='')
@@ -113,6 +201,3 @@ while(True):
   else:
     print('Unrecognized opcode of value ' + str(opcode))
     exit()
-  
-# todo: write functions for retrieving value operands, address operands, and register operands
-# todo: write functions for saving above operand types
