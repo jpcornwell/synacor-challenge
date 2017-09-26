@@ -21,6 +21,7 @@ OPCODES['WMEM'] = 16
 OPCODES['CALL'] = 17
 OPCODES['RET'] = 18
 OPCODES['OUT'] = 19
+OPCODES['IN'] = 20
 OPCODES['NOOP'] = 21
 
 def load_val_operand(pc):
@@ -70,6 +71,8 @@ memory = [bytes([0, 0]) for i in range(2**15)]
 stack = list()
 
 pc = 0
+
+input_buf = ''
 
 with open('challenge.bin', 'rb') as file:
   program = file.read()
@@ -195,6 +198,13 @@ while(True):
   elif opcode == OPCODES['OUT']:
     ascii_val = load_val_operand(pc+1)
     print(chr(ascii_val), end='')
+    pc += 2
+  elif opcode == OPCODES['IN']:
+    if len(input_buf) == 0:
+      input_buf = input() + '\n'
+    ascii_val = ord(input_buf[0])
+    input_buf = input_buf[1:]
+    save_register_operand(pc+1, ascii_val)
     pc += 2
   elif opcode == OPCODES['NOOP']:
     pc += 1
