@@ -1,0 +1,5 @@
+maze:
+west, south, north
+
+coin
+9, 2, 5, 7, 3
