@@ -25,7 +25,7 @@ OPCODES['IN'] = 20
 OPCODES['NOOP'] = 21
 
 def load_val_operand(pc):
-  word = int.from_bytes(memory[pc], byteorder='little')
+  word = int.from_bytes(memory[pc], 'little')
   if 0 <= word <= 32767:
     return word
   elif 32768 <= word <= 32775:
@@ -35,7 +35,7 @@ def load_val_operand(pc):
     exit()
 
 def load_address_operand(pc):
-  word = int.from_bytes(memory[pc], byteorder='little')
+  word = int.from_bytes(memory[pc], 'little')
   if 0 <= word <= 32767:
     address = word
   elif 32768 <= word <= 32775:
@@ -43,11 +43,11 @@ def load_address_operand(pc):
   else:
     print('Invalid address operand')
     exit()
-  val = int.from_bytes(memory[address], byteorder='little')
+  val = int.from_bytes(memory[address], 'little')
   return val
 
 def save_register_operand(pc, value):
-  word = int.from_bytes(memory[pc], byteorder='little')
+  word = int.from_bytes(memory[pc], 'little')
   if 32768 <= word <= 32775:
     registers[word - 32768] = value
   else:
@@ -55,7 +55,7 @@ def save_register_operand(pc, value):
     exit()
 
 def save_address_operand(pc, value):
-  word = int.from_bytes(memory[pc], byteorder='little')
+  word = int.from_bytes(memory[pc], 'little')
   if 0 <= word <= 32767:
     address = word
   elif 32768 <= word <= 32775:
@@ -82,7 +82,7 @@ for i in range(0, len(program), 2):
   memory[i//2] = program[i : i+2]
 
 while(True):
-  opcode = int.from_bytes(memory[pc], byteorder='little')
+  opcode = int.from_bytes(memory[pc], 'little')
   if opcode == OPCODES['HALT']:
     print('Program terminated')
     exit()
@@ -153,27 +153,24 @@ while(True):
     save_register_operand(pc+1, remain)
     pc += 4
   elif opcode == OPCODES['AND']:
-    a = load_val_operand(pc+2).to_bytes(2, byteorder='little')
-    b = load_val_operand(pc+3).to_bytes(2, byteorder='little')
-    c = (a[0] & b[0]).to_bytes(1, byteorder='little') + \
-        (a[1] & b[1]).to_bytes(1, byteorder='little')
-    ans = int.from_bytes(c, byteorder='little')
+    a = load_val_operand(pc+2).to_bytes(2, 'little')
+    b = load_val_operand(pc+3).to_bytes(2, 'little')
+    c = bytes([a[0] & b[0], a[1] & b[1]])
+    ans = int.from_bytes(c, 'little')
     save_register_operand(pc+1, ans)
     pc += 4
   elif opcode == OPCODES['OR']:
-    a = load_val_operand(pc+2).to_bytes(2, byteorder='little')
-    b = load_val_operand(pc+3).to_bytes(2, byteorder='little')
-    c = (a[0] | b[0]).to_bytes(1, byteorder='little') + \
-        (a[1] | b[1]).to_bytes(1, byteorder='little')
-    ans = int.from_bytes(c, byteorder='little')
+    a = load_val_operand(pc+2).to_bytes(2, 'little')
+    b = load_val_operand(pc+3).to_bytes(2, 'little')
+    c = bytes([a[0] | b[0], a[1] | b[1]])
+    ans = int.from_bytes(c, 'little')
     save_register_operand(pc+1, ans)
     pc += 4
   elif opcode == OPCODES['NOT']:
-    a = load_val_operand(pc+2).to_bytes(2, byteorder='little')
+    a = load_val_operand(pc+2).to_bytes(2, 'little')
 
-    b = (~a[0] & 0xFF).to_bytes(1, 'little') + \
-        (~a[1] & 0x7F).to_bytes(1, 'little')
-    ans = int.from_bytes(b, byteorder='little')
+    b = bytes([~a[0] & 0xff, ~a[1] & 0x7f])
+    ans = int.from_bytes(b, 'little')
     save_register_operand(pc+1, ans)
     pc += 3
   elif opcode == OPCODES['RMEM']:
