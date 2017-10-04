@@ -1,9 +1,13 @@
 #!/usr/bin/python3
 
 import argparse
+import shelve
 
 parser = argparse.ArgumentParser()
 parser.add_argument('input')
+parser.add_argument('-l', '--load', 
+                    help='load virtual machine from a specific state (given via input option)', 
+                    action='store_true')
 args = parser.parse_args()
 
 OPCODES = {}
@@ -75,17 +79,24 @@ def save_address_operand(pc, value):
 registers = [0] * 8
 memory = [bytes([0, 0]) for i in range(2**15)]
 stack = list()
-
 pc = 0
-
 input_buf = ''
 
-with open(args.input, 'rb') as file:
-  program = file.read()
-
 # load program into memory
-for i in range(0, len(program), 2):
-  memory[i//2] = program[i : i+2]
+if args.load == False:
+  with open(args.input, 'rb') as file:
+    program = file.read()
+
+  for i in range(0, len(program), 2):
+    memory[i//2] = program[i : i+2]
+
+# load from state
+if args.load == True:
+  with shelve.open(args.input) as state:
+    registers = state['registers']
+    memory = state['memory']
+    stack = state['stack']
+    pc = state['pc']
 
 while(True):
   opcode = int.from_bytes(memory[pc], 'little')
@@ -205,6 +216,19 @@ while(True):
   elif opcode == OPCODES['IN']:
     if len(input_buf) == 0:
       input_buf = input() + '\n'
+
+    # DEBUG
+    if input_buf == 'debug: save\n':
+      with shelve.open('state.out') as state:
+        state['registers'] = registers
+        state['memory'] = memory
+        state['stack'] = stack
+        state['pc'] = pc
+      print('State has been saved')
+      input_buf = ''
+      continue
+    # END DEBUG
+
     ascii_val = ord(input_buf[0])
     input_buf = input_buf[1:]
     save_register_operand(pc+1, ascii_val)
