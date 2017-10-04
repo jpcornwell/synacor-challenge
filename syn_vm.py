@@ -1,5 +1,11 @@
 #!/usr/bin/python3
 
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('input')
+args = parser.parse_args()
+
 OPCODES = {}
 OPCODES['HALT'] = 0
 OPCODES['SET'] = 1
@@ -74,7 +80,7 @@ pc = 0
 
 input_buf = ''
 
-with open('challenge.bin', 'rb') as file:
+with open(args.input, 'rb') as file:
   program = file.read()
 
 # load program into memory
