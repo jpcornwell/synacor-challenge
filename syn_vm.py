@@ -8,6 +8,9 @@ parser.add_argument('input')
 parser.add_argument('-l', '--load', 
                     help='load virtual machine from a specific state (given via input option)', 
                     action='store_true')
+parser.add_argument('-t', '--trace', 
+                    help='create a trace of the program execution',
+                    action='store_true')
 args = parser.parse_args()
 
 OPCODES = {}
@@ -33,6 +36,50 @@ OPCODES['RET'] = 18
 OPCODES['OUT'] = 19
 OPCODES['IN'] = 20
 OPCODES['NOOP'] = 21
+
+OPCODE_TRACE_FMT = [None] * 22
+OPCODE_TRACE_FMT[0] = 'HALT'
+OPCODE_TRACE_FMT[1] = 'SET {} {}'
+OPCODE_TRACE_FMT[2] = 'PUSH {}'
+OPCODE_TRACE_FMT[3] = 'POP {}'
+OPCODE_TRACE_FMT[4] = 'EQ {} {} {}'
+OPCODE_TRACE_FMT[5] = 'GT {} {} {}'
+OPCODE_TRACE_FMT[6] = 'JMP {}'
+OPCODE_TRACE_FMT[7] = 'JT {} {}'
+OPCODE_TRACE_FMT[8] = 'JF {} {}'
+OPCODE_TRACE_FMT[9] = 'ADD {} {} {}'
+OPCODE_TRACE_FMT[10] = 'MULT {} {} {}'
+OPCODE_TRACE_FMT[11] = 'MOD {} {} {}'
+OPCODE_TRACE_FMT[12] = 'AND {} {} {}'
+OPCODE_TRACE_FMT[13] = 'OR {} {} {}'
+OPCODE_TRACE_FMT[14] = 'NOT {} {}'
+OPCODE_TRACE_FMT[15] = 'RMEM {} {}'
+OPCODE_TRACE_FMT[16] = 'WMEM {} {}'
+OPCODE_TRACE_FMT[17] = 'CALL {}'
+OPCODE_TRACE_FMT[18] = 'RET {}'
+OPCODE_TRACE_FMT[19] = 'OUT {}'
+OPCODE_TRACE_FMT[20] = 'IN {}'
+OPCODE_TRACE_FMT[21] = 'NOOP'
+
+def print_operand(pc):
+  word = int.from_bytes(memory[pc], 'little')
+  if 0 <= word <= 32767:
+    return str(word)
+  elif 32768 <= word <= 32775:
+    return 'R' + str(word - 32768)
+
+def print_trace(pc):
+  opcode = int.from_bytes(memory[pc], 'little')
+  with open('trace.out', 'a') as trace:
+    # print the address of the opcode
+    trace.write('${:<8}'.format(pc.to_bytes(2, 'little').hex()))
+    trace.write('${:<8}'.format(pc))
+
+    # print the opcode
+    trace.write(OPCODE_TRACE_FMT[opcode]
+                  .format(print_operand(pc+1),
+                          print_operand(pc+2),
+                          print_operand(pc+3)) + '\n')
 
 def load_val_operand(pc):
   word = int.from_bytes(memory[pc], 'little')
@@ -98,7 +145,13 @@ if args.load == True:
     stack = state['stack']
     pc = state['pc']
 
+# start a new trace if trace.out already exists and -t is specified
+if args.trace == True:
+  open('trace.out', 'w').close()
+
 while(True):
+  if args.trace == True:
+    print_trace(pc)
   opcode = int.from_bytes(memory[pc], 'little')
   if opcode == OPCODES['HALT']:
     print('Program terminated')
