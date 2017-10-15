@@ -11,6 +11,9 @@ parser.add_argument('-l', '--load',
 parser.add_argument('-t', '--trace', 
                     help='create a trace of the program execution',
                     action='store_true')
+parser.add_argument('-d', '--debug',
+                    help='start syn-vm in debug mode',
+                    action='store_true')
 args = parser.parse_args()
 
 OPCODES = {}
@@ -68,18 +71,28 @@ def print_operand(pc):
   elif 32768 <= word <= 32775:
     return 'R' + str(word - 32768)
 
-def print_trace(pc):
+def get_opcode_format(pc):
   opcode = int.from_bytes(memory[pc], 'little')
-  with open('trace.out', 'a') as trace:
-    # print the address of the opcode
-    trace.write('${:<8}'.format(pc.to_bytes(2, 'little').hex()))
-    trace.write('${:<8}'.format(pc))
+  out = ''
+  # print the address of the opcode
+  out += '${:<8}'.format(pc.to_bytes(2, 'little').hex())
+  out += '${:<8}'.format(pc)
 
-    # print the opcode
-    trace.write(OPCODE_TRACE_FMT[opcode]
-                  .format(print_operand(pc+1),
-                          print_operand(pc+2),
-                          print_operand(pc+3)) + '\n')
+  # print the opcode
+  out += OPCODE_TRACE_FMT[opcode].format(print_operand(pc+1),
+                                         print_operand(pc+2),
+                                         print_operand(pc+3))
+  return out
+
+def print_trace(pc):
+  out = get_opcode_format(pc)
+  with open('trace.out', 'a') as trace:
+    trace.write(out + '\n')
+
+def print_debug(pc):
+  out = get_opcode_format(pc)
+  print(out + '\n')
+    
 
 def load_val_operand(pc):
   word = int.from_bytes(memory[pc], 'little')
@@ -123,6 +136,18 @@ def save_address_operand(pc, value):
   save = value.to_bytes(2, 'little')
   memory[address] = save
 
+def debug_menu():
+  print('Registers (0-7): ' + str(registers))
+  print('Stack: ' + str(stack))
+  print('DEBUG> ', end='')
+  command = input()
+  if command == 'step' or command == '':
+    return
+  if command == 'continue':
+    global debug_break
+    debug_break = False
+    return
+
 registers = [0] * 8
 memory = [bytes([0, 0]) for i in range(2**15)]
 stack = list()
@@ -149,9 +174,18 @@ if args.load == True:
 if args.trace == True:
   open('trace.out', 'w').close()
 
+if args.debug == True:
+  debug_break = True
+else:
+  debug_break = False
+
 while(True):
   if args.trace == True:
     print_trace(pc)
+  if args.debug == True:
+    print_debug(pc)
+    if debug_break == True:
+      debug_menu()
   opcode = int.from_bytes(memory[pc], 'little')
   if opcode == OPCODES['HALT']:
     print('Program terminated')
@@ -268,6 +302,7 @@ while(True):
     pc += 2
   elif opcode == OPCODES['IN']:
     if len(input_buf) == 0:
+      print('INPUT> ', end='')
       input_buf = input() + '\n'
 
     # DEBUG
