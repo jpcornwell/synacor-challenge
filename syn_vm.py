@@ -151,6 +151,10 @@ def debug_menu():
     command = command.split()
     debug_breakpoints.append(int(command[2]))
     debug_menu()
+  if command.startswith('set register'):
+    command = command.split()
+    registers[int(command[2])] = int(command[3])
+    debug_menu()
 
 registers = [0] * 8
 memory = [bytes([0, 0]) for i in range(2**15)]
