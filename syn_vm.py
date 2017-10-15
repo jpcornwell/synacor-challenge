@@ -147,6 +147,10 @@ def debug_menu():
     global debug_break
     debug_break = False
     return
+  if command.startswith('break address'):
+    command = command.split()
+    debug_breakpoints.append(int(command[2]))
+    debug_menu()
 
 registers = [0] * 8
 memory = [bytes([0, 0]) for i in range(2**15)]
@@ -176,6 +180,7 @@ if args.trace == True:
 
 if args.debug == True:
   debug_break = True
+  debug_breakpoints = []
 else:
   debug_break = False
 
@@ -184,6 +189,8 @@ while(True):
     print_trace(pc)
   if args.debug == True:
     print_debug(pc)
+    if pc in debug_breakpoints:
+      debug_break = True
     if debug_break == True:
       debug_menu()
   opcode = int.from_bytes(memory[pc], 'little')
