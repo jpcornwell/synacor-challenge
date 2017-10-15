@@ -143,15 +143,15 @@ def debug_menu():
   command = input()
   if command == 'step' or command == '':
     return
-  if command == 'continue':
+  elif command == 'continue':
     global debug_break
     debug_break = False
     return
-  if command.startswith('break address'):
+  elif command.startswith('break address'):
     command = command.split()
     debug_breakpoints.append(int(command[2]))
     debug_menu()
-  if command.startswith('set register'):
+  elif command.startswith('set register'):
     command = command.split()
     registers[int(command[2])] = int(command[3])
     debug_menu()
