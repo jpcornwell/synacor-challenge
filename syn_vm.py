@@ -309,7 +309,11 @@ while(True):
     pc = jump
   elif opcode == OPCODES['OUT']:
     ascii_val = load_val_operand(pc+1)
-    print(chr(ascii_val), end='')
+    if args.debug == True:
+      with open('display.out', 'a') as display:
+        display.write(chr(ascii_val))
+    else:
+      print(chr(ascii_val), end='')
     pc += 2
   elif opcode == OPCODES['IN']:
     if len(input_buf) == 0:
