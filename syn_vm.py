@@ -147,13 +147,13 @@ def debug_menu():
     global debug_break
     debug_break = False
     return
-  elif command.startswith('break address'):
+  elif command.startswith('set break'):
     command = command.split()
     debug_breakpoints.append(int(command[2]))
     debug_menu()
-  elif command.startswith('remove break address'):
+  elif command.startswith('remove break'):
     command = command.split()
-    debug_breakpoints.remove(int(command[3]))
+    debug_breakpoints.remove(int(command[2]))
     debug_menu()
   elif command.startswith('display breaks'):
     print('Breaks: ' + str(debug_breakpoints))
