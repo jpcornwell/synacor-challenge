@@ -151,6 +151,13 @@ def debug_menu():
     command = command.split()
     debug_breakpoints.append(int(command[2]))
     debug_menu()
+  elif command.startswith('remove break address'):
+    command = command.split()
+    debug_breakpoints.remove(int(command[3]))
+    debug_menu()
+  elif command.startswith('display breaks'):
+    print('Breaks: ' + str(debug_breakpoints))
+    debug_menu()
   elif command.startswith('set register'):
     command = command.split()
     registers[int(command[2])] = int(command[3])
