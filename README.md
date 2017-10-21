@@ -92,11 +92,11 @@ The commands you can run from the debug menu are these.
 Utils
 -----
 
-###Crack Programs
+### Crack Programs
 These are programs to crack the key for the teleporter game-code. Simply
 compile and run them. The inputs are hard coded in.
 
-###Disassembler
+### Disassembler
 This will try to disassemble syn-vm machine code to an assembly-like
 readable format. It doesn't do anything special for differentiating
 between code and data within a binary, but it should work well enough for 
@@ -106,7 +106,7 @@ most situations.
 ./disassembler.py program.bin
 ```
 
-###Print Dump
+### Print Dump
 This is just a quick script that I wrote for printing a hexdump-like
 printout to the screen of a syn-vm binary. The reasoning was that hexdump
 was giving me addresses per byte, and I wanted addresses to be per word,
