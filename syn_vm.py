@@ -329,7 +329,7 @@ while(True):
 
     # DEBUG
     if input_buf == 'debug: save\n':
-      with shelve.open('state.out') as state:
+      with shelve.open('save.state') as state:
         state['registers'] = registers
         state['memory'] = memory
         state['stack'] = stack
