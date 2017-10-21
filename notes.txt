@@ -1,5 +1,11 @@
 maze:
 west, south, north
 
-coin
+coin:
 9, 2, 5, 7, 3
+
+teleporter:
+set break on address 6027 (this is the code that verifies R7 value)
+set R7 to 25734 to properly use teleporter
+set R0 to 0 to skip verification logic
+then set R0 to 6 to mimic successful verification
