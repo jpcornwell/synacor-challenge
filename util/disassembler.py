@@ -31,6 +31,9 @@ OPCODE_TRACE_FMT[20] = 'IN {}'
 OPCODE_TRACE_FMT[21] = 'NOOP'
 
 def print_operand(pc):
+  if pc > len(memory) - 1:
+    return ''
+
   word = int.from_bytes(memory[pc], 'little')
   if 0 <= word <= 32767:
     return str(word)
@@ -69,3 +72,6 @@ while True:
 
   # count the number of operands and increment PC accordingly
   pc += OPCODE_TRACE_FMT[opcode].count('{}') + 1
+
+  if pc > len(memory) - 1:
+    exit()
