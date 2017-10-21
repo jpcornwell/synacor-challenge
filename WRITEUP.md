@@ -25,10 +25,24 @@ stub: again did manually in less than 5 minutes
 stub: include a code snippet that solves this (just for fun)
 
 
+Using the teleporter (Code 7)
+=============================
+stub: thought I could get by with tracer and hexdump
+stub: created a debugger to provide interactivity
+stub: created a disassembler to locate where I was in the logic
+stub: had seen a hint on reddit mentioning ackermann function
+stub: provide definition of verifier function in terms of m, n, and k
+stub: tried to come up with a closed form solution by hand
+stub: got m = 0, m = 1, and m = 2
+stub: using that, optimized the code (crack-better-verifier.c) to use m = 2
+      formula, solved in 10 seconds
+stub: tried optimizing further, use a loop to calculate m = 3, improved
+      solving time to 3 seconds
+
+
 Conclusion
 ==========
-stub: would like to write a "to syn machine code" compiler
-stub: maybe a dsl for creating text adventures also
-stub: write a debugger
+stub: would like to write a "to syn machine code" compiler (or assembler)
+stub: thinking about a connect four game for the syn-vm
 stub: look out for more things from this guy (like advent of code)
 
