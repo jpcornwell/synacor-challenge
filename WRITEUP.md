@@ -13,21 +13,55 @@ skip forward to the solutions.
 
 Implementing the syn virtual machine (Codes 1-4)
 ================================================
-stub: pretty straightforward (had previous experience writing CHIP-8 emulator)
+The first item you are tasked with is to create a virtual machine that
+implements the given specification.
+
+This virtual machine is very basic, and anyone with rudimentary knowledge
+on how computers work should be able to throw something together
+relatively quickly. Luckily I had written a Chip-8 emulator before, so I
+wasn't completely clueless as to how to proceed.
 
 
 Navigating the maze (Code 5)
 ============================
-stub: went from reverse engineering the binary to writing a map by hand
-stub: subtle variations in room description an intentional hint
-stub: attention to fine detail a good characteristic for programmers
-stub: did by hand in less than 5 minutes
-stub: will need to go back and try writing a room mapper
+Once you get the virtual machine going, you then run the given binary with
+it. What you find is that the binary is actually a text adventure game!
+Playing through it, you soon find yourself in a maze with some very bizarre
+characteristics. For example, going north repeatedly will eventually take
+you where you started. To proceed with the game, you need to navigate your
+way out of this maze.
+
+My first thought was I would need to reverse engineer the binary file.
+Since I had just written a virtual machine, I figured all of the following
+challenges would be ones that required hacking the ROM. 
+
+So I started off by doing a simple "strings" on the binary, but didn't get
+anything useful back. Then I tried doing "strings" on a memory dump that I
+extracted after the self-tests ran, in case the program decrypted itself. 
+Sure enough, I then got some valid results including the room descriptions.
+
+But as I examined the room descriptions I found they were not exactly the
+same. They all had subtle differences, which I figured was obviously 
+some sort of hint for solving this.
+
+So I went through the maze again, this time actually paying attention to the
+text. Luckily, the room descriptions are different enough that you can
+uniquely identify each room. Now I could keep track of the rooms in my head
+and within 5 minutes I found the exit. All in all, this makes sense to have
+as a challenge since attention to detail is an important trait for a
+programmer.
 
 
 Solving the coin puzzle (Code 6)
 ================================
-stub: again did manually in less than 5 minutes
+So after getting through the maze, you find yourself confronted with yet
+another puzzle. This time a door that unlocks by solving the equation etched
+on it. It essentially is of the form ... and you are given a set of values
+to place in the blanks.
+
+I have to admit, I was a little disappointed in how easy this one was. Using
+educated guesswork, I was able to solve manually in a few tries.
+
 stub: include a code snippet that solves this (just for fun)
 
 
