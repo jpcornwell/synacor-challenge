@@ -1,8 +1,14 @@
 
+
 Intro
 =====
-stub: describe this challenge
-stub: who created it
+This writeup is divided by sections detailing the individual exercises 
+within the synacor challenge. Each section will contain a description of the
+problem followed by an account of how I solved it. Anyone reading this 
+should have already solved the overall challenge, but the problem 
+descriptions may serve as a reminder for those who don't fully remember 
+them. If however, the problems are fresh in your head, then you can simply 
+skip forward to the solutions.
 
 
 Implementing the syn virtual machine (Codes 1-4)
@@ -45,4 +51,5 @@ Conclusion
 stub: would like to write a "to syn machine code" compiler (or assembler)
 stub: thinking about a connect four game for the syn-vm
 stub: look out for more things from this guy (like advent of code)
+
 
