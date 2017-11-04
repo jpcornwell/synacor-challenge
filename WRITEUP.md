@@ -2,9 +2,9 @@
 
 Intro
 =====
-This writeup is divided by sections detailing the individual exercises 
-within the synacor challenge. Each section will contain a description of the
-problem followed by an account of how I solved it. Anyone reading this 
+This writeup is divided into sections detailing the individual exercises 
+within the synacor challenge. Each section will contain a description of 
+the problem followed by an account of how I solved it. Anyone reading this 
 should have already solved the overall challenge, but the problem 
 descriptions may serve as a reminder for those who don't fully remember 
 them. If however, the problems are fresh in your head, then you can simply 
@@ -44,8 +44,8 @@ But as I examined the room descriptions I found they were not exactly the
 same. They all had subtle differences, which I figured was obviously 
 some sort of hint for solving this.
 
-So I went through the maze again, this time actually paying attention to the
-text. Luckily, the room descriptions are different enough that you can
+So I went through the maze again, this time actually paying attention to 
+the text. Luckily, the room descriptions are different enough that you can
 uniquely identify each room. Now I could keep track of the rooms in my head
 and within 5 minutes I found the exit. All in all, this makes sense to have
 as a challenge since attention to detail is an important trait for a
@@ -78,17 +78,87 @@ for a, b, c, d, e in permutations([2, 3, 5, 7, 9]):
 
 Using the teleporter (Code 7)
 =============================
-stub: thought I could get by with tracer and hexdump
-stub: created a debugger to provide interactivity
-stub: created a disassembler to locate where I was in the logic
-stub: had seen a hint on reddit mentioning ackermann function
-stub: provide definition of verifier function in terms of m, n, and k
-stub: tried to come up with a closed form solution by hand
-stub: got m = 0, m = 1, and m = 2
-stub: using that, optimized the code (crack-better-verifier.c) to use m = 2
-      formula, solved in 10 seconds
-stub: tried optimizing further, use a loop to calculate m = 3, improved
-      solving time to 3 seconds
+After solving the equation, you then come across a teleporter. You also
+obtain a book describing how to operate your new teleportation device. It
+mentions something about an 8th register needing to be set to a non-zero
+value. Doing this then activates a verification routine, for the teleporter
+requires a very specific value, and if that value is not met, you may rip
+the space time continuum (or something like that). The only issue is that
+your teleporter is rather low-tech and will take about a billion years to
+run through the verification algorithm.
+
+Though the previous problem was a bit lackluster, this one more than makes
+up for it. The teleporter is definitely the most interesting (and most
+difficult) exercise in the entire challenge.
+
+At first, I thought this was just going to be a simple equality check. (I
+guess I wasn't really understanding the whole take a billion years to
+verify thing.) So I tried getting by with nothing more than a trace routine
+which would print off all the instructions my vm executed. This however,
+was not enough, and I began work on a debugger. This allowed me to interact
+more with the program, but I was still having trouble visualizing where
+exactly I was in the overall logic. One disassembler later, and I had what
+I needed to start solving the problem.
+
+Now I have to admit that unfortunately (or maybe fortunately) I stumbled
+upon a hint on reddit mentioning the Ackermann function. So knowing that,
+and using my newly crafted tools, I was able to piece together what was
+happening.
+
+Essentially, the value in the R7 register is actually a key for decrypting
+the next game code, and the verification routine is verifying that you have
+the correct value for that key. So to get through this, one has to extract
+the verification algorithm, optimize it, figure out the correct key, put
+that key in R7, and then force the vm to skip the verification routine.
+
+Okay, so the algorithm is a modified version of the Ackermann function. The
+definition is as follows.
+
+```
+A(m, n) =
+  n + 1               if m = 0
+  A(m-1, k)           if m > 0 and n = 0
+  A(m-1, A(m, n-1))   if m > 0 and n > 0
+
+where k is some constant
+```
+
+The program is setting m to 4, n to 1, and k to the value in R7, and then
+checking that the result is 6. This will only happen with the correct key
+value.
+
+I was hoping to come up with an elegant closed form solution that I could
+then solve by hand, but was not successful. I got to m = 0, 1, and 2, but
+then after that it got too complicated.
+
+```
+A(0, n) = n + 1
+A(1, n) = k + n + 1
+A(2, n) = n(k+1) + 2k + 1
+```
+
+Figuring out these formulas was not in vain though. I then wrote a program
+(crack-better-verifier.c) that defined A recursively, but for m = 2, fell
+back to the closed form solution I came up with. This reduced the
+recursion enough that the program could solve for k in about 10 seconds.
+
+That got me the answer, but it was kind of slow. I then optimized further
+(crack-even-better-verifier.c) by having the function use a looping
+construct to solve for when m = 3. This got me down to about 3 seconds.
+
+The loop construct is possible because using the closed form solutions
+we can simplify m = 3 to the following.
+
+```
+A(3, n) =
+  A(2, k)          = K^2 + 3k + 1                   if n = 0
+  A(2, A(3, n-1))  = A(3, n-1) * (k+1) + 2k + 1     if n > 0
+```
+
+
+Unlocking the vault (Code 8)
+=============================
+stub: put stuff here
 
 
 Conclusion
