@@ -117,3 +117,15 @@ me what I wanted, but this was quicker.
 ```
 ./print_dump.py program.bin
 ```
+
+Useful
+------
+
+### notes.txt
+Solutions to most of the problems
+
+### grid.txt
+Visualization and solution to the vault problem
+
+### decrypted_dump.bin
+A memory dump of the challenge.bin after it has run the self tests and decrypted itself
