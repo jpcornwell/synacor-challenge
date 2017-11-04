@@ -55,14 +55,25 @@ programmer.
 Solving the coin puzzle (Code 6)
 ================================
 So after getting through the maze, you find yourself confronted with yet
-another puzzle. This time a door that unlocks by solving the equation etched
-on it. It essentially is of the form ... and you are given a set of values
-to place in the blanks.
+another puzzle. This time an equation like so.
 
-I have to admit, I was a little disappointed in how easy this one was. Using
-educated guesswork, I was able to solve manually in a few tries.
+_ + _ * _^2 + _^3 - _ = 399
 
-stub: include a code snippet that solves this (just for fun)
+You are then given 5 values with which to fill out the blanks with.
+
+I have to admit, I was a little disappointed in how easy this one was. 
+Using educated guesswork, I was able to solve manually in a few tries.
+
+Just for fun though, here is some python code that will solve it
+automatically.
+
+```
+from itertools import permutations
+
+for a, b, c, d, e in permutations([2, 3, 5, 7, 9]):
+    if a + b * c**2 + d**3 - e == 399:
+        print(a, b, c, d, e)
+```
 
 
 Using the teleporter (Code 7)
