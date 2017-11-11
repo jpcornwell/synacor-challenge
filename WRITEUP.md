@@ -13,9 +13,11 @@ skip forward to the solutions.
 
 Implementing the syn virtual machine (Codes 1-4)
 ================================================
+### Problem
 The first item you are tasked with is to create a virtual machine that
 implements the given specification.
 
+### Solution
 This virtual machine is very basic, and anyone with rudimentary knowledge
 on how computers work should be able to throw something together
 relatively quickly. Luckily I had written a Chip-8 emulator before, so I
@@ -24,6 +26,7 @@ wasn't completely clueless as to how to proceed.
 
 Navigating the maze (Code 5)
 ============================
+### Problem
 Once you get the virtual machine going, you then run the given binary with
 it. What you find is that the binary is actually a text adventure game!
 Playing through it, you soon find yourself in a maze with some very bizarre
@@ -31,6 +34,7 @@ characteristics. For example, going north repeatedly will eventually take
 you where you started. To proceed with the game, you need to navigate your
 way out of this maze.
 
+### Solution
 My first thought was I would need to reverse engineer the binary file.
 Since I had just written a virtual machine, I figured all of the following
 challenges would be ones that required hacking the ROM. 
@@ -54,6 +58,7 @@ programmer.
 
 Solving the coin puzzle (Code 6)
 ================================
+### Problem
 So after getting through the maze, you find yourself confronted with yet
 another puzzle. This time an equation like so.
 
@@ -61,6 +66,7 @@ _ + _ * _^2 + _^3 - _ = 399
 
 You are then given 5 values with which to fill out the blanks with.
 
+### Solution
 I have to admit, I was a little disappointed in how easy this one was. 
 Using educated guesswork, I was able to solve manually in a few tries.
 
@@ -78,6 +84,7 @@ for a, b, c, d, e in permutations([2, 3, 5, 7, 9]):
 
 Using the teleporter (Code 7)
 =============================
+### Problem
 After solving the equation, you then come across a teleporter. You also
 obtain a book describing how to operate your new teleportation device. It
 mentions something about an 8th register needing to be set to a non-zero
@@ -87,6 +94,7 @@ the space time continuum (or something like that). The only issue is that
 your teleporter is rather low-tech and will take about a billion years to
 run through the verification algorithm.
 
+### Problem
 Though the previous problem was a bit lackluster, this one more than makes
 up for it. The teleporter is definitely the most interesting (and most
 difficult) exercise in the entire challenge.
@@ -158,13 +166,85 @@ A(3, n) =
 
 Unlocking the vault (Code 8)
 =============================
-stub: put stuff here
+### Problem
+There is now one last puzzle to solve. After teleporting successfully to
+a beach, you continue on and find a locked vault with a very elaborate
+locking mechanism. Before the vault lies a grid of rooms, with markings on
+the floor like so.
+
+```
+ *      8      -      1
+ 4      *     11      *
+ +      4      -     18
+22      -      9      *
+```
+
+You start off at the lower left and are given a value of 22. As you walk
+around the grid, depending on what rooms you enter, your value will change.
+For example, walking on a plus sign followed by a four means that your
+given value will increment by four. You can only go up, down, left, and
+right, so you will always alternate between operator and operand. The goal
+is then to end at the upper right with a value of 30, in a minimal amount 
+of moves. Also, the extreme lower left room cannot be re-entered, and the
+extreme upper right room can only be entered once.
+
+### Solution
+So this was another interesting challenge. I figured that the overall path
+wouldn't be too long, so I decided to brute force it using find_path.py.
+
+To simplify the program, I only actually work with rooms that have
+operands in them. I then create the relationship between these rooms by 
+going through each of them and listing the possible routes to the next 
+available room along with how that route will adjust the current value.
+
+Once that is properly modeled, I then use a recursive function that will
+go through all the possible paths that don't exceed a specified number of
+steps. If it ever gets to the goal room with a value of 30, it will print
+the path and exit. Finally, to help whittle down the search space, I back 
+up if the value ever falls below 0 or gets ridiulously big.
+
+To solve, I then call that function repeatedly, starting with a path length
+of 0 and incrementing the number of steps until I get a path that works.
+Since the correct path is only 6 steps long, I can get the answer in about
+30 milliseconds.
+
+One optimization I had thought of, but ended up not needing, was to go
+through the grid backwards. Basically you would start with a value of 30
+and need to get to 22, but the operators would include division instead of
+multiplication. Also, the operator would have to apply the operand as the
+number of the room you came from, not the number of the room you went to.
+The advantage of this though, is that you could potentially cut off entire
+branches because you know that if you perform a division and end up with a
+non-whole number, then it isn't a valid path.
+
+It could be a fun challenge to come up with a variation of this grid such
+that a brute force solution going forward is computationally impractical,
+but a solution going  backwards and trimming the immediately invalid
+branches is computationally trivial.
 
 
 Conclusion
 ==========
-stub: would like to write a "to syn machine code" compiler (or assembler)
-stub: thinking about a connect four game for the syn-vm
-stub: look out for more things from this guy (like advent of code)
+So all in all, this was an awesome challenge to go through. I really like
+when challenge authors take the time to add some story elements into the
+mix. I am also looking forward to starting the Advent of Code challenges
+which appear to be similar.
+
+One thing I find interesting is that the implementation of the challenges
+was probably quite involved. I would definitely love to see
+a writeup from the actual author as to how he made this challenge and what
+techniques he employed to try to prevent unwanted reverse engineering. In
+fact, another thing that is so awesome about this challenge is that trying
+to hack the ROM and access the game codes directly without solving the
+problems could serve as a fun meta challenge to all of this.
+
+I am extremely glad to have stumbled on this because doing the synacor
+challenge has gotten me back into the habit of working fun type projects 
+on the side. I already have a large list of other challenges to go work,
+and I would love to maybe try my hand at making some myself.
+
+As a further exercise for this particular challenge, after having a bit
+more assembly programming under my belt, I wouldn't mind coming back and
+writing some programs for syn-vm. Maybe a connect four game would be cool.
 
 
